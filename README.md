@@ -35,15 +35,13 @@ The code operates using Javascript with Typescript within the Angular framework.
 - Percentages are calculated against the flour. Each ingredient has a percentage, then there is a total percentage. 
 - Using all the information from above, the weight can be determined. Either size or weight is needed, and the calculator can derive the information it needs from there.
 
-# Calculator Service
+# Context
 
-### Context
+Within the Calculator tab if the user inputs valid values, those values are assigned to variables within the `Calculator` service. 
 
-1. Within the Calculator tab if the user inputs valid values, those values are assigned to variables within the `Calculator` service. 
+# Constructor
 
-### Constructor
-
-2. The constructor within the Calculator class does some initialization, creating objects using the Conversions class constructor. At first they are initialized with 0 ounces (starting point for weight), and 0 teaspoons (starting point for volume). 
+The constructor within the Calculator class does some initialization, creating objects using the Conversions class constructor. At first they are initialized with 0 ounces (starting point for weight), and 0 teaspoons (starting point for volume). 
 
 ```
 this.prefermentFlour = new Conversions("Flour", 0, 0);
@@ -52,10 +50,10 @@ this.prefermentYeast = new Conversions("Yeast", 0, 0);
 this.prefermentTotal = new Conversions("Total", 0, 0);
 ```
 
-### The `update()` method
+# The `update()` method
 This is called from the Calculator tab to kick off the calculations. 
 
-3. If using the metric system (grams), some quick conversions are done as part of the reassignment. Like so:
+1. If using the metric system (grams), some quick conversions are done as part of the reassignment. Like so:
 
 ```
 if (useMetric) {
@@ -84,7 +82,7 @@ export class Constants {
 }
 ```
 
-4. Speaking of constant values, every pizza ingredient you can dream of is defined and contains nutrition information. 
+2. Speaking of constant values, every pizza ingredient you can dream of is defined and contains nutrition information. 
 
 ```
 nutritionDefinitions = {
@@ -104,7 +102,7 @@ nutritionDefinitions = {
 
 Additionally in `public-objects.ts`, additional ingredients are given metadata. This includes a `ratio` value which is used to calculate the weight density of the ingredient, or ounces per US tablespoon. 
 
-5. Given that pizza can be circular, and not just rectangular, some functions are provided to calculate the weight of a pizza based on either the radius. The following methods are defined:
+3. Given that pizza can be circular, and not just rectangular, some functions are provided to calculate the weight of a pizza based on either the radius. The following methods are defined:
 
 ```
     let circleArea = (radius: number) => {
@@ -141,13 +139,13 @@ Quick explanation of these functions:
 - `getMiddleSize`: This function calculates the center diameter based on the bottom size and a delta. It uses the hypotenuse of a right triangle and trigonometric functions to calculate the result. The variable `panHeight` is the height of the pan lip, bottom to top. The variable `doughHeight` is the height of the dough within that pan. 
 ---
 
-5. Additionally, pizza dough can be calculated by a given weight, or a given size. Weight is easy. Size however accounts for different kinds of pans, even those with sloped sides. A factor has to be generated. This factor acts as an anchor for the calculations, a constant value that all calculations are based on. 
+4. Additionally, pizza dough can be calculated by a given weight, or a given size. Weight is easy. Size however accounts for different kinds of pans, even those with sloped sides. A factor has to be generated. This factor acts as an anchor for the calculations, a constant value that all calculations are based on. 
 
 Here's if it's done by weight:
 ```
 factor = useMetric ? weight / Constants.GramsInOunce : weight;
 ```
-If it's done by size, it's a bit more complicated. 
+If it's done by size (volume), it's a bit more complicated. 
 ```
 let bottomRadius = bottomDiameter / 2;
 let bottomArea = isRound
@@ -194,24 +192,24 @@ Explanation:
 - If the pan does not have sloped sides, the area of the sides is calculated. If the pan is round, the area is calculated using the `circum` function and the height of the dough (`doughHeight`). If the pan is not round, the area is calculated as the sum of the lengths of the four sides times the height of the dough.
 - The factor is then calculated as the sum of the bottom area and the sides area times a `thicknessFactor`.
 
-6. If `bowlResidue` is used (the amount of dough that sticks to the bowl and is left behind), the factor is adjusted accordingly. 
+5. If `bowlResidue` is used (the amount of dough that sticks to the bowl and is left behind), the factor is adjusted accordingly. 
 ```
 factor *= bowlResidue;
 ```
-7. If the dough will stuffed, the factor is adjusted accordingly. 
+6. If the dough will stuffed, the factor is adjusted accordingly. 
 ```
 if (isStuffed) factor *= 1 + stuffedAmount / 100;
 ```
-8. A total percentage of ingredients against the flour is added together (as well as assigned to their own variables for later). Say you had a recipe that was just 100 grams of flour and 100 grams of water, your total percentage would be 200%. All percentages are calculated against the flour. 
+7. A total percentage of ingredients against the flour is added together (as well as assigned to their own variables for later). Say you had a recipe that was just 100 grams of flour and 100 grams of water, your total percentage would be 200%. All percentages are calculated against the flour. 
 
 ```
 let totalPercent = hydrationPercent + saltPercent + yeastPercent + 100 + addedPercentages;
 ```
-9. The total weight of the dough is added together, including any additional ingredients (done with a reducer). No code snippet needed for this one. 
+8. The total weight of the dough is added together, including any additional ingredients (done with a reducer). No code snippet needed for this one. 
 
-10. If the dough is stuffed, the dough is split into two parts, `innerBall` and `outerBall` according to the percentages provided by the user (outer skin percentage, or `stuffedAmount`). No code snippet for this one. 
+9. If the dough is stuffed, the dough is split into two parts, `innerBall` and `outerBall` according to the percentages provided by the user (outer skin percentage, or `stuffedAmount`). No code snippet for this one. 
 
-11. Every ingredient (if you remember, are objects with a Conversions class) now get their percentages and amounts updated, now that those values are known from steps 8 and 9.: 
+10. Every ingredient (if you remember, are objects with a Conversions class) now get their percentages and amounts updated, now that those values are known from steps 8 and 9.: 
 ```
     this.flour.updatePercent(100);
     this.totalFlour.updatePercent(100);
@@ -230,9 +228,9 @@ and
 
 If prefermentation is being used, these percentages will be altered to account for the preferment / Poolish that will be cut from the whole. This code is extensive, but straightforward so I also won't include a snippet here.
 
-### Nutrition
+# Nutrition
 
-12. The Nutrition Facts information is generated by breaking each dough portion into services (or "slices") and then calculating the nutrition information for each slice. 
+The Nutrition Facts information is generated by breaking each dough portion into services (or "slices") and then calculating the nutrition information for each slice. 
 
 `unexpectedCalculateSlices()`: This function calls `calculateDefaultNumberOfSlices()` with sizing parameters and then calls `calculateNutrition()` to calculate the nutrition information for the dough.
 
@@ -341,4 +339,9 @@ Note: `metric` pulls from the nutrition definitions, which are defined at the to
   }
 ```
 
-13. At the end of everything, there is data available to render a recipe table with ingredients by weight, and the nutrition facts can be viewed. 
+#Conclusion
+At the end of everything, there is data available to render a recipe table with ingredients by weight, and the nutrition facts can be viewed. 
+
+The calculator doesn't do anything that hasn't been done before. What sets it apart in practical use is that it's built for the home kitchen. While other proofing methods may require commercial yeast, this calculator is made for wild or natural yeast. Additionally, the Poolish (preferment) are cut from the whole and calculated against the weight of the flour. Beyond that, it's just math. 
+
+Hope you enjoyed! 
