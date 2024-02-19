@@ -187,10 +187,18 @@ factor = (bottomArea + sidesArea) * thicknessFactor;
 Explanation:
 
 - The radius of the bottom of the pan (`bottomRadius`) is calculated as half of the bottom diameter (`bottomDiameter`).
-- The area of the bottom of the pan (`bottomArea`) is calculated. If the pan is round (`isRound` is true), the area is calculated using the `circleArea` function with `bottomRadius` as the argument. If the pan is rectangular, the area is calculated as the product of the pan's length (`panLength`) and width (`panWidth`).
-- If the pan is a deep dish (`isDeepDish` is true), the area of the sides is calculated. If the pan has sloped sides (`hasSlopedSides` is true), the calculation differs based on whether the pan is round or not. For a round pan, the area is calculated using the `getMiddleSize` function and the formula for the area of a cylinder. For a non-round pan, the area is calculated as the sum of the areas of four trapezoids (due to the a 4-way cross-section) using the `trapezoidArea` function.
-- If the pan does not have sloped sides, the area of the sides is calculated. If the pan is round, the area is calculated using the `circum` function and the height of the dough (`doughHeight`). If the pan is not round, the area is calculated as the sum of the lengths of the four sides times the height of the dough.
+- The area of the bottom of the pan (`bottomArea`) is calculated. 
+  - If the pan is round (`isRound` is true), the area is calculated using the `circleArea` function (pi * (bottomRadius ^ 2)) with `bottomRadius` as the argument. 
+  - If the pan is rectangular (`isRound` is false), the area is calculated as the product of the pan's length (`panLength`) and width (`panWidth`).
 - The factor is then calculated as the sum of the bottom area and the sides area times a `thicknessFactor`.
+
+For more complicated areas involving deep dish or sloped pans, we do the following:
+- If the pan is for deep dish (`isDeepDish` is true) *without* sloped sides, the area of the sides is calculated: 
+  - If the pan is rectangular, the area of the sides is calculated by adding the four sides together and multiplying it by the `doughHeight`. 
+  - If the pan is round, the area is calculated using the product of the `circum` function return value and the height of the dough (`doughHeight`). This gets the area of the dough as though it were a cylinder. 
+- If the pan is for deep dish (`isDeepDish` is true) *with* sloped sides (`hasSlopedSides` is true), the calculation differs based on whether the pan is round or not:
+  - For a round pan, the code calculates the lateral surface area of a frustum of a cone (a cone with the top cut off). This is calculated using the `getMiddleSize` function to get the middle diameter, then the `sidesArea` is calculated as the product of the middle diameter and the height of the dough times pi. 
+  - For a rectangular pan, the area is calculated as the sum of the areas of four trapezoids (due to the a 4-way cross-section) using the `trapezoidArea` function. It can be described as getting the frustum of a rectangular pyramid.
 
 5. If `bowlResidue` is used (the amount of dough that sticks to the bowl and is left behind), the factor is adjusted accordingly. 
 ```
