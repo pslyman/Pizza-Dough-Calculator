@@ -347,7 +347,7 @@ Note: `metric` pulls from the nutrition definitions, which are defined at the to
   }
 ```
 
-#Conclusion
+# Conclusion
 At the end of everything, there is data available to render a recipe table with ingredients by weight, and the nutrition facts can be viewed. 
 
 The calculator doesn't do anything that hasn't been done before. What sets it apart in practical use is that it's built for the home kitchen. While other proofing methods may require commercial yeast, this calculator is made for wild or natural yeast. Additionally, the Poolish (preferment) are cut from the whole and calculated against the weight of the flour. Beyond that, it's just math. 
